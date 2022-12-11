@@ -1,13 +1,14 @@
 function love.load()
   --assetit
   tie = love.graphics.newImage("tie.png")
-  tausta = love.graphics.newCanvas(840,650*2)
+  resolution = {x=840, y=650}
+  tausta = love.graphics.newCanvas(resolution.x,resolution.y*2)
   love.graphics.setCanvas(tausta)
   love.graphics.draw(tie,0,0)
-  love.graphics.draw(tie,0,650)
+  love.graphics.draw(tie,0,resolution.y)
   love.graphics.setCanvas()
-  rullaus =-650
-  nopeus = 100--pikseliä sekunnissa
+  rullaus =resolution.y*-1
+  nopeus = 300--pikseliä sekunnissa
   
   auto = love.graphics.newImage("auto.png")
   autoX,autoY = 240,400
@@ -32,14 +33,17 @@ function törmäys(ax1,ay1,aw,ah, bx1,by1,bw,bh)
 end
 
 function love.update(dt)
+  --Background movement
   rullaus=rullaus+dt*nopeus
-  if rullaus>=0 then rullaus=-650 end
+  if rullaus>=0 then rullaus=-resolution.y*-1 end
   
   samisarvinenY=samisarvinenY+dt*nopeus
-  if samisarvinenY>650 then samisarvinenY=-50
+  if samisarvinenY>650 then
+    samisarvinenY=-50
     samisarvinenX = math.random(1,800)
   end
 
+  --Player input and movement
   if love.keyboard.isDown("left","a") then
     suunta = "vasen"
   elseif love.keyboard.isDown("right","d") then
@@ -47,13 +51,12 @@ function love.update(dt)
   else
     suunta = "eteen"
   end
-
-
   if suunta == "vasen" and autoX>130 then autoX=autoX-dt*50*(nopeus/100) end
   if suunta == "oikea" and autoX<620 then autoX=autoX+dt*50*(nopeus/100) end
   if suunta == "vasen" and math.floor(autoX)==130 then suunta="eteen" end
   if suunta == "oikea" and math.ceil(autoX)==620 then suunta="eteen" end
   
+  --Increase game speed infinitely
   nopeus=nopeus+dt
   
   piste=törmäys(samisarvinenX+20,samisarvinenY+20,60,60,autoX,autoY,92,180)
