@@ -26,13 +26,6 @@ function love.load()
   piste2=false
 end
 
-function love.keypressed(key)
-  if (key == "left" or key == "a") and suunta == "eteen" then suunta = "vasen" end
-  if (key == "right" or key == "d") and suunta == "eteen" then suunta = "oikea" end
-  if (key == "left" or key == "a") and suunta == "oikea" then suunta = "eteen" end
-  if (key == "right" or key == "d") and suunta == "vasen" then suunta = "eteen" end
-end
-
 function törmäys(ax1,ay1,aw,ah, bx1,by1,bw,bh)
   local ax2,ay2,bx2,by2 = ax1 + aw, ay1 + ah, bx1 + bw, by1 + bh
   return ax1 < bx2 and ax2 > bx1 and ay1 < by2 and ay2 > by1
@@ -44,8 +37,18 @@ function love.update(dt)
   
   samisarvinenY=samisarvinenY+dt*nopeus
   if samisarvinenY>650 then samisarvinenY=-50
-    samisarvinenX = math.random(1,800) end
-  
+    samisarvinenX = math.random(1,800)
+  end
+
+  if love.keyboard.isDown("left","a") then
+    suunta = "vasen"
+  elseif love.keyboard.isDown("right","d") then
+    suunta = "oikea"
+  else
+    suunta = "eteen"
+  end
+
+
   if suunta == "vasen" and autoX>130 then autoX=autoX-dt*50*(nopeus/100) end
   if suunta == "oikea" and autoX<620 then autoX=autoX+dt*50*(nopeus/100) end
   if suunta == "vasen" and math.floor(autoX)==130 then suunta="eteen" end
