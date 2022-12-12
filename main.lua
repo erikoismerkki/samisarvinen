@@ -50,11 +50,13 @@ function love.update(dt)
     --Test collisions to objects
     if törmäys(obstacles[i].x+20,obstacles[i].y+20,60,60,autoX,autoY,92,180) then
       if obstacles[i].isHostile then
-        --Hostile elements or failstate not implemented yet
-      else
+        --TODO: Implement hostile objects
+      elseif not obstacles[i].isDead then
         table.remove(obstacles, i)
         pistelaskuri=pistelaskuri+1
         love.audio.play(au)
+      else
+        --TODO: Implement setting object dead and changing sprite
       end
     end
 
