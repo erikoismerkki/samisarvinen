@@ -23,9 +23,16 @@ function love.load()
   prum:play()
   
   au = love.audio.newSource("au.mp3","static")
+  kaboom = love.audio.newSource("kaboom.wav","static")
+  --pumgif = love.
+  
+  tynnyri = love.graphics.newImage("barrel.png")
   
   pistelaskuri=0
   piste2=false
+  
+  gameoverY=0
+  gameover=false
 end
 
 function törmäys(ax1,ay1,aw,ah, bx1,by1,bw,bh)
@@ -41,17 +48,17 @@ function love.update(dt)
   for i,v in ipairs(obstacles) do
     --Scroll object down the road
     obstacles[i].y=obstacles[i].y+dt*nopeus
-
-    --Remove objects that are offscreen
-    if obstacles[i].y>resolution.y+5 then
-      table.remove(obstacles, i)
-    end
-
+    
     --Test collisions to objects
     if törmäys(obstacles[i].x+20,obstacles[i].y+20,60,60,autoX,autoY,92,180) then
       if obstacles[i].isHostile then
         --TODO: Implement hostile objects
-      elseif not obstacles[i].isDead then
+        love.audio.play(kaboom)
+        nopeus = nopeus*-1
+        gameover = true
+        gameoverY = 0
+      end
+      if not obstacles[i].isDead then
         table.remove(obstacles, i)
         pistelaskuri=pistelaskuri+1
         love.audio.play(au)
@@ -59,12 +66,30 @@ function love.update(dt)
         --TODO: Implement setting object dead and changing sprite
       end
     end
+    
+    --Remove objects that are offscreen
+    if not obstacles==nil then
+      if obstacles[i].y>resolution.y+5 then
+        table.remove(obstacles, i)
+      end
+    end
 
+  end
+  
+  if gameover then
+    gameoverY = gameoverY + nopeus*dt
+    if love.keyboard.isDown("space") then
+      love.load()
+    end
   end
 
   --Add samisarvinen to objects
-  if math.random(0,40000)<nopeus then
-    table.insert(obstacles, {isHostile = false, isDead = false, sprite = samisarvinen, x = math.random(130,620), y = 0})
+  if math.random(0,8000000)*dt<nopeus then
+    if math.random(0,1)>0.2 then
+      table.insert(obstacles, {isHostile = false, isDead = false, sprite = samisarvinen, x = math.random(130,620), y = 0})
+    else
+      table.insert(obstacles, {isHostile = true, isDead= false, sprite = tynnyri, x = math.random(130,620), y = 0})
+    end
   end
 
   --Player input and movement
@@ -93,10 +118,11 @@ function love.draw()
   end
   love.graphics.draw(auto,math.ceil(autoX),autoY,0,0.35,0.35)
   
-  --hitboxit
-  --[[love.graphics.rectangle("line",samisarvinenX+20,samisarvinenY+20,60,60)
-  love.graphics.rectangle("line",autoX,autoY,92,180)--]]
-  
   --pisteet
   love.graphics.print(pistelaskuri,60,30)
+  
+  if gameoverY<-900 then
+    love.graphics.print("Game over | Hävisit pelin",100,100)
+    love.graphics.print("Start a new game by pressing 'space bar button' | Aloita uusi peli painamalla 'välilyönti'",100,120)
+  end
 end
